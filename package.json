@@ -1,0 +1,40 @@
+{
+  "name": "fysrt",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "bin": "fysrt",
+  "description": "translate srt subtitle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/woopen/fysrt.git"
+  },
+  "keywords": [
+    "translate",
+    "translator",
+    "srt",
+    "subtitle"
+  ],
+  "author": "wopen",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.20.0",
+    "configstore": "^4.0.0",
+    "fs-extra": "^8.0.1",
+    "got": "^9.6.0",
+    "inquirer": "^6.3.1",
+    "klaw": "^3.0.0",
+    "safe-eval": "^0.4.1",
+    "signale": "^1.4.0",
+    "translate-google-cn": "^1.0.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0"
+  }
+}
