@@ -8,10 +8,12 @@ const signale = require('signale');
 const Srt = require('./srt');
 const translate = require('translate-google-cn');
 
+const { version } = require('../package.json')
+
 const interactive = new signale.Signale({ interactive: true });
 
 commander
-  .version('1.0.0')
+  .version(version)
   .option('-d, --delete', '删除原文件')
   .option('-s, --single', '单语字幕，而不是双语字幕')
   .option('-f, --from <lang>', '原始语言，默认 auto')
