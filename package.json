@@ -1,8 +1,8 @@
 {
   "name": "fysrt",
   "version": "1.0.0",
-  "main": "./src/index.js",
-  "bin": "fysrt",
+  "main": "src/index.js",
+  "bin": "src/index.js",
   "description": "translate srt subtitle",
   "repository": {
     "type": "git",
