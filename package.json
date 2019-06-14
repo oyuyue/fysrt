@@ -1,6 +1,6 @@
 {
   "name": "fysrt",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "src/fysrt.js",
   "bin": "src/fysrt.js",
   "description": "translate srt subtitle",
