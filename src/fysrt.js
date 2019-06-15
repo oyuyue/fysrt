@@ -23,6 +23,10 @@ commander
   .option('-f, --from <lang>', '原始语言，默认 auto')
   .option('-t, --to <lang>', '翻译成什么语言，默认 zh-cn')
   .option(
+    '-T, --time <time>',
+    '每个字幕文件的翻译时间间隔 毫秒，默认 3000 毫秒'
+  )
+  .option(
     '-S, --size <size>',
     '一次给 google api 翻译的文本量，默认一次 50 行字幕'
   )
@@ -34,6 +38,12 @@ commander
     console.log('  $ fysrt -f en a.srt');
   })
   .parse(process.argv);
+
+function sleep(time = 0) {
+  return new Promise(resolve => {
+    setTimeout(resolve, time);
+  });
+}
 
 async function translateSubtitleFile(
   target,
@@ -98,12 +108,14 @@ async function run() {
   let stat = null;
   stat = fs.statSync(target);
 
+  const time = parseInt(commander.time, 10);
   const options = {
     keep: !commander.delete,
     single: commander.single,
     from: commander.from || 'auto',
     to: commander.to || 'zh-cn',
-    size: commander.size || 50
+    size: commander.size || 50,
+    time: isNaN(time) ? 3000 : time
   };
 
   if (stat.isFile()) {
@@ -131,6 +143,7 @@ async function run() {
           interactive.await('[%d/%d] - %s', i + 1, len, files[i]);
           try {
             await translateSubtitleFile(files[i], options);
+            await sleep(options.time);
           } catch (error) {
             interactive.fatal(error);
             errors.push(files[i]);
