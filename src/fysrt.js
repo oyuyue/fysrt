@@ -24,7 +24,7 @@ commander
   .option('-t, --to <lang>', '翻译成什么语言，默认 zh-cn')
   .option(
     '-S, --size <size>',
-    '一次给 google api 翻译的文本量，默认一次 100 行字幕'
+    '一次给 google api 翻译的文本量，默认一次 50 行字幕'
   )
   .on('--help', () => {
     console.log();
@@ -54,7 +54,12 @@ async function translateSubtitleFile(
 
   const res = await Promise.all(requests);
   const text = srt.genFileText(
-    res.map(r => r.text.split('\n\n')).flat(),
+    res
+      .map(r => r.text.split('\n\n'))
+      .reduce((acc, val) => {
+        acc.push(...val);
+        return acc;
+      }, []),
     !single
   );
 
@@ -98,7 +103,7 @@ async function run() {
     single: commander.single,
     from: commander.from || 'auto',
     to: commander.to || 'zh-cn',
-    size: commander.size || 100
+    size: commander.size || 50
   };
 
   if (stat.isFile()) {
@@ -132,16 +137,15 @@ async function run() {
           }
         }
 
-        interactive.success('[%d/%d] - 全部翻译完成', len, len);
-
         if (errors.length > 0) {
+          interactive.success('[%d/%d] - 翻译完成', len - errors.length, len);
           signale.debug('以下文件翻译出错 >>>>>>>>>>>>>>');
           console.log();
-          errors.forEach(e => {
-            signale.error(e);
-          });
+          errors.forEach(e => signale.error(e));
           process.exit(1);
         }
+
+        interactive.success('[%d/%d] - 全部翻译完成', len, len);
       });
   } else {
     throw new Error(`非法资源 -> ${target}`);
