@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const path = require('path');
 const fs = require('fs-extra');
 const walk = require('klaw');
@@ -49,14 +51,14 @@ async function translateSubtitleFile(target, { from, to, single, keep, size = 10
   );
 
   const { dir, name } = path.parse(target);
-  const fileName = keep ? path.resolve(dir, `${name}_${to}.srt`) : `$${target}`;
+  const fileName = keep ? path.resolve(dir, `${name}_${to}.srt`) : `${target}.tmp`;
   fs.writeFileSync(fileName, text);
 
   if (!keep) {
     fs.removeSync(target);
-    fs.renameSync('$' + target, target);
+    fs.renameSync(target + '.tmp', target);
   } else {
-    fs.removeSync('$' + target);
+    fs.removeSync(target + '.tmp');
   }
 }
 
