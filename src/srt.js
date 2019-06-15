@@ -21,9 +21,10 @@ class Srt {
   genFileText(translate, keep) {
     return (
       this._data
-        .map((d, i) => {
-          return `${i + 1}\n${d[0]}\n${translate[i]}${keep ? '\n' + d[1] : ''}`;
-        })
+        .map(
+          (d, i) =>
+            `${i + 1}\n${d[0]}\n${translate[i]}${keep ? '\n' + d[1] : ''}`
+        )
         .join('\n\n') + '\n\n'
     );
   }

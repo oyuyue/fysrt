@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 const path = require('path');
 const fs = require('fs-extra');
 const walk = require('klaw');
@@ -10,7 +12,7 @@ const signale = require('signale');
 const Srt = require('./srt');
 const translate = require('translate-google-cn');
 
-const { version } = require('../package.json')
+const { version } = require('../package.json');
 
 const interactive = new signale.Signale({ interactive: true });
 
@@ -20,17 +22,23 @@ commander
   .option('-s, --single', '单语字幕，而不是双语字幕')
   .option('-f, --from <lang>', '原始语言，默认 auto')
   .option('-t, --to <lang>', '翻译成什么语言，默认 zh-cn')
-  .option('-S, --size <size>', '一次给 google api 翻译的文本量，默认一次 100 行字幕')
-  .on("--help", () => {
+  .option(
+    '-S, --size <size>',
+    '一次给 google api 翻译的文本量，默认一次 100 行字幕'
+  )
+  .on('--help', () => {
     console.log();
-    console.log("Examples:");
-    console.log("  $ fysrt ./subtitles");
-    console.log("  $ fysrt -d a.srt");
-    console.log("  $ fysrt -f en a.srt");
+    console.log('Examples:');
+    console.log('  $ fysrt ./subtitles');
+    console.log('  $ fysrt -d a.srt');
+    console.log('  $ fysrt -f en a.srt');
   })
   .parse(process.argv);
 
-async function translateSubtitleFile(target, { from, to, single, keep, size = 100 }) {
+async function translateSubtitleFile(
+  target,
+  { from, to, single, keep, size = 100 }
+) {
   const srt = new Srt();
   const textArr = srt.parse(fs.readFileSync(target, 'utf-8'));
 
@@ -51,7 +59,9 @@ async function translateSubtitleFile(target, { from, to, single, keep, size = 10
   );
 
   const { dir, name } = path.parse(target);
-  const fileName = keep ? path.resolve(dir, `${name}_${to}.srt`) : `${target}.tmp`;
+  const fileName = keep
+    ? path.resolve(dir, `${name}_${to}.srt`)
+    : `${target}.tmp`;
   fs.writeFileSync(fileName, text);
 
   if (!keep) {
@@ -81,11 +91,7 @@ async function run() {
   target = path.resolve(process.cwd(), target);
 
   let stat = null;
-  try {
-    stat = fs.statSync(target);
-  } catch (error) {
-    return signale.fatal(error);
-  }
+  stat = fs.statSync(target);
 
   const options = {
     keep: !commander.delete,
@@ -100,21 +106,19 @@ async function run() {
       return signale.error('文件必须是 .srt 文件');
     }
 
-    try {
-      interactive.await(target);
-      await translateSubtitleFile(target, options);
-      interactive.success('翻译完成！');
-    } catch (error) {
-      interactive.fatal(error);
-    }
+    interactive.await(target);
+    await translateSubtitleFile(target, options);
+    interactive.success('翻译完成！');
   } else if (stat.isDirectory()) {
     const files = [];
     walk(target)
       .on('data', ({ path: p }) => p && p.endsWith('.srt') && files.push(p))
       .on('end', async () => {
         const len = files.length;
-        if (len === 0)
-          return signale.error(`目录下没有 .srt 文件 -> ${target}`);
+        if (len === 0) {
+          signale.error(`目录下没有 .srt 文件 -> ${target}`);
+          process.exit(1);
+        }
 
         const errors = [];
 
@@ -136,13 +140,17 @@ async function run() {
           errors.forEach(e => {
             signale.error(e);
           });
+          process.exit(1);
         }
       });
   } else {
-    signale.error(`非法资源 -> ${target}`);
+    throw new Error(`非法资源 -> ${target}`);
   }
 }
 
 if (module.parent == null) {
-  run().catch(e => signale.fatal(e));
+  run().catch(e => {
+    signale.fatal(e);
+    process.exit(1);
+  });
 }
